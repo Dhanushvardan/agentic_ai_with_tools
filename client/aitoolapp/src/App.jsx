@@ -18,6 +18,7 @@ function App() {
   const triggerdb = async () => {
     try {
       const res = await axios.post("http://127.0.0.1:8000/adduser", {
+        id: 0,
         bio: inval,
       });
       console.log(res.data.response);
@@ -28,7 +29,17 @@ function App() {
   const checkdb = async () => {
     try {
       const res = await axios.get("http://127.0.0.1:8000/getdata");
-      console.log(res.data);
+      console.log(res.data.response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const askai = async () => {
+    try {
+      const res = await axios.post("http://127.0.0.1:8000/askai", {
+        msg: inval,
+      });
+      console.log(res.data.response);
     } catch (err) {
       console.log(err);
     }
@@ -37,7 +48,7 @@ function App() {
     <div className="App">
       <div className="header">Hello agentic ai with db</div>
       <div className="body">
-        <label>Insert bio</label>
+        <label>Ask ai</label>
         <input
           onChange={(e) => {
             setInVal(e.target.value);
@@ -45,8 +56,9 @@ function App() {
         ></input>
 
         <button onClick={checkCon}>check connection</button>
-        <button onClick={triggerdb}>send to PYMONGO</button>
+        {/* <button onClick={triggerdb}>send to PYMONGO</button> */}
         <button onClick={checkdb}>check db</button>
+        <button onClick={askai}>ask ai</button>
       </div>
       <div className="footer">Thank you</div>
     </div>
