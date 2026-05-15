@@ -5,9 +5,14 @@ from pydantic import BaseModel
 from langgraph.graph import StateGraph
 from langchain_openai import ChatOpenAI
 from pymongo import ReturnDocument
-from langchain.schema import Document
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
+# from langchain.schema import Document
+# # from langchain.embeddings import HuggingFaceEmbeddings
+# # from langchain.vectorstores import FAISS
+# from langchain_community.embeddings import HuggingFaceEmbeddings
+# from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
 
 
 app = FastAPI()
@@ -20,7 +25,7 @@ app.add_middleware(
 )
 
 llm = ChatOpenAI(
-    
+    api_key = "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",
     base_url = "https://api.groq.com/openai/v1",
     model = "llama-3.3-70b-versatile",
 )
@@ -29,9 +34,10 @@ llm = ChatOpenAI(
 def startNode(state):
     input = state["input"]
     qn = state["qn"]
-    doc = Document(page_content=input,metadata={id:1})
+    doc = Document(page_content=input,metadata={"id":1})
     embeddings = HuggingFaceEmbeddings(model_name = "sentence-transformers/all-MiniLM-L6-v2")
-    vectorstore = FAISS.from_documents(doc,embeddings)
+    # vectorstore = FAISS.from_documents(doc,embeddings)
+    vectorstore = FAISS.from_documents([doc], embeddings)
     retriever = vectorstore.as_retriever()
     dddd = retriever.get_relevant_documents(qn)
     context = "\n".join([d.page_content for d in dddd])
@@ -41,7 +47,8 @@ def startNode(state):
 def ragNode(state):
     ct = state["ct"]
     qn = state["qn"]
-    res = llm.invoke("the context is " + ct +" now answer for " + an)
+    # res = llm.invoke("the context is " + ct +" now answer for " + an)
+    res = llm.invoke(f"The context is {ct}. Now answer: {qn}")
     return {"response":res.content}
     
 
@@ -100,7 +107,9 @@ async def Adduser(user:t):
 
 graph = StateGraph(state)
 graph.add_node("startNode", startNode)
+graph.add_node("ragNode",ragNode)
 graph.set_entry_point("startNode")
+graph.add_edge("startNode","ragNode")
 
 
 app_graph = graph.compile()
@@ -121,7 +130,7 @@ async def askai(msg : tt):
     res =await collections.find_one({"id":3})
     res = str(res["bio"])
     
-    op = app_graph.invoke({"input":res,"qn":msg})
+    op = app_graph.invoke({"input":res,"qn":msg.msg})
     return {"response":op["response"]}
     
 

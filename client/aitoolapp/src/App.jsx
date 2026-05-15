@@ -6,6 +6,7 @@ function App() {
   const [inval, setInVal] = useState("");
   const [inval1, setInVal1] = useState(0);
   const [inval2, setInVal2] = useState("");
+  const [resp, setResp] = useState("");
   const checkCon = async () => {
     try {
       const res = await axios.get("http://127.0.0.1:8000/");
@@ -40,6 +41,7 @@ function App() {
         msg: inval,
       });
       console.log(res.data.response);
+      setResp(res.data.response);
     } catch (err) {
       console.log(err);
     }
@@ -60,7 +62,7 @@ function App() {
         <button onClick={checkdb}>check db</button>
         <button onClick={askai}>ask ai</button>
       </div>
-      <div className="footer">Thank you</div>
+      <div className="footer">{resp}</div>
     </div>
   );
 }
