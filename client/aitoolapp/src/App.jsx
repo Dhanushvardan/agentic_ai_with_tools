@@ -50,7 +50,7 @@ function App() {
     <div className="App">
       <div className="header">Hello agentic ai with db</div>
       <div className="body">
-        <label>Ask ai</label>
+        <label>Ask question</label>
         <input
           onChange={(e) => {
             setInVal(e.target.value);
